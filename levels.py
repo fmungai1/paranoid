@@ -693,7 +693,7 @@ class Level(arcade.View, ABC):
 
         # After the score has finished updating, wait for a while before
         # exiting the level
-        elif self.load_next_level and self.elapsed_time > self.elapsed_time_copy + PAUSE_TIME:
+        elif self.load_next_level and self.elapsed_time > self.elapsed_time_copy + PAUSE_TIME - 1:
             self.window.show_view(LevelOutroView(self))
 
     def on_draw(self):
