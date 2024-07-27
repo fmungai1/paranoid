@@ -27,11 +27,17 @@ Sound Effects: [zapsplat.com](https://www.zapsplat.com/)
 
 1. Install [Poetry](https://python-poetry.org/) (preferably using [pipx](https://pipx.pypa.io/stable/))
 
+2. Clone this repository
+
+    ```cmd
+    git clone https://github.com/fmungai1/paranoid.git
+
+    cd paranoid
+    ```
+
 2. Create and activate virtual environment
 
     ```cmd
-    cd paranoid
-
     poetry env use <path/to/Python38/python.exe>
 
     poetry shell
