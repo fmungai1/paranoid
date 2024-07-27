@@ -5,9 +5,10 @@ Contains boundaries, levels and views used in the game
 # Allows specifying of type checking hints without having to use string literals,
 # e.g "ParanoidGame" in Level __init__ method
 from __future__ import annotations
+from pathlib import Path
 
 import arcade
-import assets
+import paranoid.assets as assets
 import random
 import time
 import os
@@ -19,7 +20,7 @@ from collections import namedtuple
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
-    from paranoid import ParanoidGame
+    from paranoid.main import ParanoidGame
 
 # I programmed this specifically for the screen size I was working with
 # at the time (1536 x 864 pixels) - fullscreen TODO: Add support for different screen sizes
@@ -48,14 +49,21 @@ MAX_BOUNCES = 3
 GRAVITY = 0.4
 VELOCITY_RETAINED = 0.7
 
+# Assets
+ASSETS_BASE_PATH = Path(__file__).parent.parent.parent / "assets"
+IMAGES_BASE_PATH = ASSETS_BASE_PATH / "images"
+AUDIO_BASE_PATH = ASSETS_BASE_PATH / "audio"
+FONTS_BASE_PATH = ASSETS_BASE_PATH / "fonts"
+HIGH_SCORES_FILE = ASSETS_BASE_PATH / "high_scores.txt"
+
 # Global Sounds
-ENTER_SOUND = arcade.Sound("audio/sounds/press_enter.wav")
-SCROLL_SOUND = arcade.Sound("audio/sounds/scroll_options.wav")
-WHOOSH_SOUND = arcade.Sound("audio/sounds/whoosh_1.wav")
+ENTER_SOUND = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/press_enter.wav")
+SCROLL_SOUND = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/scroll_options.wav")
+WHOOSH_SOUND = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/whoosh_1.wav")
 
 # Fonts: path to font .ttf files
-BGOTHL = "fonts/bgothl"  # BankGothic Lt BT
-BGOTHM = "fonts/bgothm"  # BankGothic Md BT
+BGOTHL = f"{FONTS_BASE_PATH}/bgothl"  # BankGothic Lt BT
+BGOTHM = f"{FONTS_BASE_PATH}/bgothm"  # BankGothic Md BT
 
 # Text-styling dictionaries
 DISPLAY_BLOCK_NUMBERS = {"color": (85, 255, 255),
@@ -163,7 +171,7 @@ def create_high_scores():
     """
     Generates the default high scores file
     """
-    with open("high_scores.txt", "w") as high_scores_file:
+    with open(HIGH_SCORES_FILE, "w") as high_scores_file:
         high_scores_file.write("name,level,score,datetime\n")
         for i in range(10, 0, -1):
             if i % 2 == 0:  # even
@@ -181,11 +189,11 @@ def get_high_scores():
     Entry = namedtuple("Entry", "name level score")
     high_scores_list = []
 
-    # If high_scores.txt file does not exist, create it TODO: Use sqlite db instead of flat file
-    if not os.path.isfile("high_scores.txt"):
+    # If HIGH_SCORES_FILE does not exist, create it TODO: Use sqlite db instead of flat file
+    if not os.path.isfile(HIGH_SCORES_FILE):
         create_high_scores()
 
-    with open("high_scores.txt") as high_scores_file:
+    with open(HIGH_SCORES_FILE) as high_scores_file:
         next(high_scores_file)  # Skip the heading
         for line in high_scores_file:
             # Ignore datetime column - only used to see how often game is played
@@ -223,9 +231,9 @@ class Boundary(ABC):
         self.is_fullscreen = False
 
         # Sounds
-        self.top_hit_sound = arcade.Sound("audio/sounds/hit_top_boundary.wav")
-        self.side_hit_sound = arcade.Sound("audio/sounds/hit_side_boundary.wav")
-        self.bottom_hit_sound = arcade.Sound("audio/sounds/hit_bottom_boundary.wav")
+        self.top_hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_top_boundary.wav")
+        self.side_hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_side_boundary.wav")
+        self.bottom_hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_bottom_boundary.wav")
 
         self.border_list = arcade.SpriteList(is_static=True)
         self.populate_border_list()  # May override other attributes, hence is last in __init__
@@ -253,7 +261,7 @@ class PlayingFieldBoundary(Boundary):
 
         # Left and right borders
         for side in ["left", "right"]:
-            border = arcade.Sprite(f"images/boundaries/playing_field_{side}_vertical_border.png",
+            border = arcade.Sprite(f"{IMAGES_BASE_PATH}/boundaries/playing_field_{side}_vertical_border.png",
                                    center_y=self.center_y)
             if side == "left":
                 border.right = self.inner_left
@@ -263,7 +271,7 @@ class PlayingFieldBoundary(Boundary):
 
         # Top and bottom borders
         for i in range(2):
-            border = arcade.Sprite("images/boundaries/playing_field_horizontal_border.png",
+            border = arcade.Sprite(f"{IMAGES_BASE_PATH}/boundaries/playing_field_horizontal_border.png",
                                    center_x=self.center_x)
             if i == 0:
                 border.bottom = self.inner_top
@@ -292,7 +300,7 @@ class FullscreenBoundary(Boundary):
 
         # Drawn as one sprite for simplicity. Hence, it has to be drawn first in a View
         # because of black background. Converting background to transparent made it shrink
-        self.border_list.append(arcade.Sprite("images/boundaries/fullscreen_boundary_black_background.png",
+        self.border_list.append(arcade.Sprite(f"{IMAGES_BASE_PATH}/boundaries/fullscreen_boundary_black_background.png",
                                               center_x=self.center_x, center_y=self.center_y))
 
 
@@ -310,7 +318,7 @@ class DisplayInfoBlock:
         self.level = level
 
         self.block_list = arcade.SpriteList(is_static=True)
-        self.block = arcade.Sprite("images/boundaries/display_info_block_black_background.png",
+        self.block = arcade.Sprite(f"{IMAGES_BASE_PATH}/boundaries/display_info_block_black_background.png",
                                    center_x=SCREEN_WIDTH - SCREEN_PADDING - 180,
                                    center_y=SCREEN_HEIGHT / 2)
         self.block_list.append(self.block)
@@ -380,7 +388,7 @@ class DemoDisplayInfoBlock:
         Initializes the display block
         """
         self.block_list = arcade.SpriteList(is_static=True)
-        self.block_list.append(arcade.Sprite("images/boundaries/demo_display_info_block.png",
+        self.block_list.append(arcade.Sprite(f"{IMAGES_BASE_PATH}/boundaries/demo_display_info_block.png",
                                              center_x=SCREEN_WIDTH - SCREEN_PADDING - 180,
                                              center_y=SCREEN_HEIGHT / 2))
 
@@ -471,7 +479,7 @@ class Level(arcade.View, ABC):
         # Sprites and textures
         self.boundary = PlayingFieldBoundary()
         self.display_info = DisplayInfoBlock(level=self)
-        self.level_info_boundary = arcade.load_texture("images/boundaries/level_info_boundary.png")
+        self.level_info_boundary = arcade.load_texture(f"{IMAGES_BASE_PATH}/boundaries/level_info_boundary.png")
         self.paddle = assets.NormalPaddle(level=self)
         self.ball_list.append(assets.NormalBall(self.boundary, self.brick_list, level=self))
 
@@ -495,15 +503,15 @@ class Level(arcade.View, ABC):
         self.window.level_number += 1
 
         # Sounds
-        self.lost_a_life_sound = arcade.Sound("audio/sounds/lose_life.wav")
-        self.game_over_voice = arcade.Sound("audio/sounds/game_over_voice.wav")
-        self.level_complete_sound = arcade.Sound("audio/sounds/level_complete_sound.wav")
-        self.level_complete_voice = arcade.Sound("audio/sounds/level_complete_voice.wav")
-        self.adding_bonus_sound_1 = arcade.Sound("audio/sounds/adding_bonus_1.wav")
-        self.adding_bonus_sound_2 = arcade.Sound("audio/sounds/adding_bonus_2.wav")
-        self.adding_bonus_sound_3 = arcade.Sound("audio/sounds/adding_bonus_3.wav")
-        self.shoot_sound = arcade.Sound("audio/sounds/shoot_bullet_sound.wav")
-        self.background_music = arcade.Sound(f"audio/background_music/level_{self.window.level_number}"
+        self.lost_a_life_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/lose_life.wav")
+        self.game_over_voice = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/game_over_voice.wav")
+        self.level_complete_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/level_complete_sound.wav")
+        self.level_complete_voice = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/level_complete_voice.wav")
+        self.adding_bonus_sound_1 = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/adding_bonus_1.wav")
+        self.adding_bonus_sound_2 = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/adding_bonus_2.wav")
+        self.adding_bonus_sound_3 = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/adding_bonus_3.wav")
+        self.shoot_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/shoot_bullet_sound.wav")
+        self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/level_{self.window.level_number}"
                                              f"_music.mp3", streaming=True)
 
         # Overwrite certain attributes if we are in a demo level
@@ -1498,14 +1506,14 @@ class BouncingIntroView(arcade.View):
         self.elapsed_time = 0
 
         # Sounds
-        self.bounce_sound_1 = arcade.Sound("audio/sounds/bounce_1.wav")
-        self.bounce_sound_2 = arcade.Sound("audio/sounds/bounce_2.wav")
-        self.level_intro_whoosh_sound = arcade.Sound("audio/sounds/whoosh_2.wav")
+        self.bounce_sound_1 = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/bounce_1.wav")
+        self.bounce_sound_2 = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/bounce_2.wav")
+        self.level_intro_whoosh_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/whoosh_2.wav")
 
         # Only load the level intro voice in a level because in GameIntroView,
         # level number is 0
         if isinstance(self.view, Level):
-            self.level_intro_voice = arcade.Sound(f"audio/sounds/level_"
+            self.level_intro_voice = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/level_"
                                                   f"{self.view.window.level_number}_voice.wav")
 
         self.first_whoosh_sound_played = False
@@ -1576,7 +1584,7 @@ class LevelOutroView(arcade.View):
         self.level = level
         self.bottom = 0
         self.change_y = 2
-        self.level_up_sound = arcade.Sound("audio/sounds/level_up_sound.wav")
+        self.level_up_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/level_up_sound.wav")
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
@@ -1697,7 +1705,7 @@ class GameIntroView(FullscreenView):
         self.add_random_balls()
 
         self.elapsed_time = 0
-        self.background_music = arcade.Sound("audio/background_music/game_intro_music.mp3",
+        self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/game_intro_music.mp3",
                                              streaming=True)
 
     def on_show(self):
@@ -1736,7 +1744,7 @@ class MainMenuView(FullscreenView):
         self.brick_list.append(assets.MenuBrick(center_x=SCREEN_WIDTH / 2,
                                                 center_y=SCREEN_HEIGHT / 2))
         self.add_random_balls()
-        self.background_music = arcade.Sound("audio/background_music/main_menu_music.mp3",
+        self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/main_menu_music.mp3",
                                              streaming=True)
 
     def on_update(self, delta_time: float):
@@ -1826,8 +1834,8 @@ class HighScoreView(FullscreenView):
         self.brick_list.append(self.high_scores_brick)
 
         self.add_random_balls()
-        self.new_high_score_voice = arcade.Sound("audio/sounds/high_score_voice.wav")
-        self.background_music = arcade.Sound("audio/background_music/high_scores_music.mp3",
+        self.new_high_score_voice = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/high_score_voice.wav")
+        self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/high_scores_music.mp3",
                                              streaming=True)
 
     def on_show(self):
@@ -1895,9 +1903,9 @@ class NameEntryView(arcade.View):
         self.ui_manager.add_ui_element(self.name_entry_box)
 
         self.border_list = arcade.SpriteList(is_static=True)
-        self.border_list.append(arcade.Sprite("images/boundaries/confirmation_dialogue_boundary.png",
+        self.border_list.append(arcade.Sprite(f"{IMAGES_BASE_PATH}/boundaries/confirmation_dialogue_boundary.png",
                                               center_x=SCREEN_WIDTH / 2, center_y=SCREEN_HEIGHT / 2))
-        self.invalid_name_sound = arcade.Sound("audio/sounds/invalid_name_tone.wav")
+        self.invalid_name_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/invalid_name_tone.wav")
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
@@ -1911,7 +1919,7 @@ class NameEntryView(arcade.View):
         self.border_list.draw()
         arcade.draw_text("Enter your name", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 80,
                          **ENTER_NAME_HEADING)
-        arcade.draw_text("15 characters max", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 80,
+        arcade.draw_text("Max: 15 characters", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 80,
                          **BONUS_NOT_COLLECTED)
 
         # If not focused, focus on it
@@ -1930,7 +1938,7 @@ class NameEntryView(arcade.View):
                 ENTER_SOUND.play(volume=NORMAL_VOLUME)
 
                 # Append a new entry in the high scores file
-                with open("high_scores.txt", mode="a") as high_scores_file:
+                with open(HIGH_SCORES_FILE, mode="a") as high_scores_file:
                     high_scores_file.write(f"{name},{self.window.level_number},{self.window.score},"
                                            f"{time.asctime()}\n")
 
@@ -1968,8 +1976,8 @@ class HowToPlayView(arcade.View):
 
         self.page = 0
         self.boundary = FullscreenBoundary()
-        self.invalid_page_sound = arcade.Sound("audio/sounds/no_next_item_tone.wav")
-        self.background_music = arcade.Sound("audio/background_music/how_to_play_music.mp3",
+        self.invalid_page_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/no_next_item_tone.wav")
+        self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/how_to_play_music.mp3",
                                              streaming=True)
 
         self.center_x = SCREEN_WIDTH / 2
@@ -2159,8 +2167,8 @@ class PauseMenuView(arcade.View):
 
         self.selected = 0
         self.options = ["Continue", "New Game", "How To Play", "Main Menu"]
-        self.border = arcade.load_texture("images/boundaries/menu_boundary.png")
-        self.background_music = arcade.Sound("audio/background_music/pause_menu_music.mp3",
+        self.border = arcade.load_texture(f"{IMAGES_BASE_PATH}/boundaries/menu_boundary.png")
+        self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/pause_menu_music.mp3",
                                              streaming=True)
 
     def on_show(self):
@@ -2256,7 +2264,7 @@ class ConfirmationDialogueView(arcade.View, ABC):
         self.view = view
         self.selected = 1
         self.options = ["Yes", "No"]
-        self.border = arcade.load_texture("images/boundaries/confirmation_dialogue_boundary.png")
+        self.border = arcade.load_texture(f"{IMAGES_BASE_PATH}/boundaries/confirmation_dialogue_boundary.png")
 
         # If we are in a pause view
         if isinstance(self.view, PauseMenuView):

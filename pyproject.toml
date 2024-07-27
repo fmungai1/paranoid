@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "paranoid"
+version = "1.1.0"
+description = "Remake of the classic Paranoid game"
+authors = ["Fredrick Mungai <https://github.com/fmungai1>"]
+readme = "README.md"
+packages = [{include = "paranoid", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+arcade = "2.4.2"
+pymunk = "<6"
+pillow = "<10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

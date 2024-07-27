@@ -7,7 +7,7 @@ Start date: 10th Aug 2020
 """
 
 import arcade
-import levels
+import paranoid.levels as levels
 
 
 class ParanoidGame(arcade.Window):

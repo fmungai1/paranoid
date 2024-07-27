@@ -10,6 +10,7 @@ Colors obtained using color picker on the original game
 # Allows specifying of type checking hints without having to use string literals,
 # e.g "Boundary" in Ball __init__ method
 from __future__ import annotations
+from pathlib import Path
 
 import arcade
 import math
@@ -19,7 +20,7 @@ from typing import List, Optional, cast, TYPE_CHECKING
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
-    from levels import Boundary, Level
+    from paranoid.levels import Boundary, Level
 
 # Debugging mode - prevents the ball from falling if True
 DEBUGGING = False
@@ -33,6 +34,11 @@ BULLET_SPEED = 300
 
 # Volumes
 NORMAL_VOLUME = 0.3
+
+# Assets
+ASSETS_BASE_PATH = Path(__file__).parent.parent.parent / "assets"
+IMAGES_BASE_PATH = ASSETS_BASE_PATH / "images"
+AUDIO_BASE_PATH = ASSETS_BASE_PATH / "audio"
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -341,7 +347,7 @@ class Ball(arcade.Sprite, ABC):
 
         # Makes the ball magnetic or bounces it normally
         if self.level.paddle.is_magnetic:
-            magnetic_ball = ball.convert_to(MagneticInviciBall) if ball.is_invincible else \
+            magnetic_ball = ball.convert_to(MagneticInvinciBall) if ball.is_invincible else \
                 ball.convert_to(MagneticNormalBall)
             self.level.paddle.magnetic_ball_list.append(magnetic_ball)
         else:
@@ -416,7 +422,7 @@ class NormalBall(Ball):
     """
 
     def initialize_texture(self):
-        self.texture = arcade.load_texture("images/balls/normal_ball.png")
+        self.texture = arcade.load_texture(f"{IMAGES_BASE_PATH}/balls/normal_ball.png")
 
 
 class InvinciBall(Ball):
@@ -425,7 +431,7 @@ class InvinciBall(Ball):
     """
 
     def initialize_texture(self):
-        self.texture = arcade.load_texture("images/balls/invincible_ball.png")
+        self.texture = arcade.load_texture(f"{IMAGES_BASE_PATH}/balls/invincible_ball.png")
         self.is_invincible = True
 
     def collides_with_brick_moving_horizontally(self):
@@ -512,13 +518,13 @@ class MagneticNormalBall(NormalBall):
             self.collides_with_boundary_moving_horizontally()
 
 
-class MagneticInviciBall(MagneticNormalBall):
+class MagneticInvinciBall(MagneticNormalBall):
     """
     Invincible version of magnetic normal ball
     """
 
     def initialize_texture(self):
-        self.texture = arcade.load_texture("images/balls/invincible_ball.png")
+        self.texture = arcade.load_texture(f"{IMAGES_BASE_PATH}/balls/invincible_ball.png")
         self.is_invincible = True
 
 
@@ -550,7 +556,7 @@ class Paddle(arcade.Sprite, ABC):
         self.center_y = self.level.boundary.inner_bottom + 20
         self.paddle_speed = PADDLE_SPEED
 
-        self.hit_sound = arcade.Sound("audio/sounds/hit_paddle.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_paddle.wav")
 
         self.is_magnetic = False
         self.activate_shooter = False
@@ -623,17 +629,17 @@ class Paddle(arcade.Sprite, ABC):
 
 class NormalPaddle(Paddle):
     def initialize_texture(self):
-        self.texture = arcade.load_texture("images/paddles/normal_paddle.png")
+        self.texture = arcade.load_texture(f"{IMAGES_BASE_PATH}/paddles/normal_paddle.png")
 
 
 class LongPaddle(Paddle):
     def initialize_texture(self):
-        self.texture = arcade.load_texture("images/paddles/long_paddle.png")
+        self.texture = arcade.load_texture(f"{IMAGES_BASE_PATH}/paddles/long_paddle.png")
 
 
 class ShortPaddle(Paddle):
     def initialize_texture(self):
-        self.texture = arcade.load_texture("images/paddles/short_paddle.png")
+        self.texture = arcade.load_texture(f"{IMAGES_BASE_PATH}/paddles/short_paddle.png")
 
 
 class DemoPaddle(Paddle):
@@ -702,7 +708,7 @@ class Brick(arcade.Sprite, ABC):
         self.score = 0
         self.letter = ""
         self.icon: Optional[Icon] = None
-        self.hit_sound = arcade.Sound("audio/sounds/hit_brick.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_brick.wav")
 
         self.images = []  # List of image files that will be converted to textures
         self.initialize_textures()  # Sub-classes possibly override other attributes,
@@ -767,78 +773,78 @@ class Brick(arcade.Sprite, ABC):
 
 class RedBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/red_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/red_brick.png"]
         super().initialize_textures()
         self.score = 100
 
 
 class BlueBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/blue_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/blue_brick.png"]
         super().initialize_textures()
         self.score = 100
 
 
 class GreenBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/green_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/green_brick.png"]
         super().initialize_textures()
         self.score = 100
 
 
 class AquaBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/aqua_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/aqua_brick.png"]
         super().initialize_textures()
         self.score = 100
 
 
 class GreyBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/grey_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/grey_brick.png"]
         super().initialize_textures()
         self.score = 100
 
 
 class RedLineBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/red_brick_with_line.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/red_brick_with_line.png"]
         super().initialize_textures()
         self.score = 150
 
 
 class BlueLineBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/blue_brick_with_line.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/blue_brick_with_line.png"]
         super().initialize_textures()
         self.score = 150
 
 
 class GreenLineBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/green_brick_with_line.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/green_brick_with_line.png"]
         super().initialize_textures()
         self.score = 150
 
 
 class AquaLineBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/aqua_brick_with_line.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/aqua_brick_with_line.png"]
         super().initialize_textures()
         self.score = 150
 
 
 class GreyLineBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/grey_brick_with_line.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/grey_brick_with_line.png"]
         super().initialize_textures()
         self.score = 150
 
 
 class PinkBrick2(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/pink_brick_1.png",
-                       "images/bricks/pink_brick_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/pink_brick_1.png",
+                       f"{IMAGES_BASE_PATH}/bricks/pink_brick_2.png"]
 
         # Shorten the image list for sub-classes
         if isinstance(self, PinkBrick1):
@@ -857,8 +863,8 @@ class PinkBrick1(PinkBrick2):
 
 class RedBlueBrick2(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/red_blue_brick_1.png",
-                       "images/bricks/red_blue_brick_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/red_blue_brick_1.png",
+                       f"{IMAGES_BASE_PATH}/bricks/red_blue_brick_2.png"]
 
         # Shorten the image list for sub-classes
         if isinstance(self, RedBlueBrick1):
@@ -881,10 +887,10 @@ class MultiColouredBrick4(Brick):
     """
 
     def initialize_textures(self):
-        self.images = ["images/bricks/multi_coloured_brick_1.png",
-                       "images/bricks/multi_coloured_brick_2.png",
-                       "images/bricks/multi_coloured_brick_3.png",
-                       "images/bricks/multi_coloured_brick_4.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/multi_coloured_brick_1.png",
+                       f"{IMAGES_BASE_PATH}/bricks/multi_coloured_brick_2.png",
+                       f"{IMAGES_BASE_PATH}/bricks/multi_coloured_brick_3.png",
+                       f"{IMAGES_BASE_PATH}/bricks/multi_coloured_brick_4.png"]
 
         # Shorten the image list for sub-classes
         if isinstance(self, MultiColouredBrick3):
@@ -921,63 +927,63 @@ class MultiColouredBrick1(MultiColouredBrick4):
 
 class UKFlagBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/uk_flag_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/uk_flag_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class KenyanFlagBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/kenyan_flag_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/kenyan_flag_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class CupBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/cup_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/cup_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class BBBBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/bbb_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/bbb_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class FNMBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/fnm_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/fnm_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class SmilingBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/smiling_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/smiling_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class FrowningBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/frowning_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/frowning_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class LeftPointingGreyBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/left_pointing_grey_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/left_pointing_grey_brick.png"]
         super().initialize_textures()
         self.score = 250
 
 
 class RightPointingGreyBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/right_pointing_grey_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/right_pointing_grey_brick.png"]
         super().initialize_textures()
         self.score = 250
 
@@ -987,7 +993,7 @@ class NormalWallBrick(Brick):
     Normal wall brick without right-side extension
     """
     def initialize_textures(self):
-        self.images = ["images/bricks/normal_wall_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/normal_wall_brick.png"]
         super().initialize_textures()
         self.score = 50
 
@@ -997,57 +1003,57 @@ class RightWallBrick(Brick):
     Wall brick that is a bit larger and extends to the right to create seamless images
     """
     def initialize_textures(self):
-        self.images = ["images/bricks/right_wall_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/right_wall_brick.png"]
         super().initialize_textures()
         self.score = 50
 
 
 class UnbreakableBrick(Brick):
     def initialize_textures(self):
-        self.images = ["images/bricks/unbreakable_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/unbreakable_brick.png"]
         super().initialize_textures()
-        self.hit_sound = arcade.Sound("audio/sounds/hit_unbreakable_brick.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_unbreakable_brick.wav")
         self.is_breakable = False
 
 
 class BonusBrick(Brick):
     def initialize_textures(self):
         super().initialize_textures()
-        self.hit_sound = arcade.Sound("audio/sounds/hit_bonus_brick.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_bonus_brick.wav")
         self.score = 100
 
 
 class BonusBBrick(BonusBrick):
     def initialize_textures(self):
-        self.images = ["images/bricks/bonus_b_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/bonus_b_brick.png"]
         super().initialize_textures()
         self.letter = "B"
 
 
 class BonusOBrick(BonusBrick):
     def initialize_textures(self):
-        self.images = ["images/bricks/bonus_o_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/bonus_o_brick.png"]
         super().initialize_textures()
         self.letter = "O"
 
 
 class BonusNBrick(BonusBrick):
     def initialize_textures(self):
-        self.images = ["images/bricks/bonus_n_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/bonus_n_brick.png"]
         super().initialize_textures()
         self.letter = "N"
 
 
 class BonusUBrick(BonusBrick):
     def initialize_textures(self):
-        self.images = ["images/bricks/bonus_u_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/bonus_u_brick.png"]
         super().initialize_textures()
         self.letter = "U"
 
 
 class BonusSBrick(BonusBrick):
     def initialize_textures(self):
-        self.images = ["images/bricks/bonus_s_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/bricks/bonus_s_brick.png"]
         super().initialize_textures()
         self.letter = "S"
 
@@ -1065,7 +1071,7 @@ class ParanoidIntroBrick(Brick):
     """
 
     def initialize_textures(self):
-        self.images = ["images/boundaries/paranoid_intro_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/boundaries/paranoid_intro_brick.png"]
         super().initialize_textures()
 
 
@@ -1075,7 +1081,7 @@ class MenuBrick(Brick):
     """
 
     def initialize_textures(self):
-        self.images = ["images/boundaries/menu_boundary.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/boundaries/menu_boundary.png"]
         super().initialize_textures()
 
 
@@ -1085,7 +1091,7 @@ class LeaderBoardBrick(Brick):
     """
 
     def initialize_textures(self):
-        self.images = ["images/boundaries/leader_board_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/boundaries/leader_board_brick.png"]
         super().initialize_textures()
 
 
@@ -1095,7 +1101,7 @@ class HighScoresBrick(Brick):
     """
 
     def initialize_textures(self):
-        self.images = ["images/boundaries/high_scores_brick.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/boundaries/high_scores_brick.png"]
         super().initialize_textures()
 
 
@@ -1123,7 +1129,7 @@ class Icon(arcade.Sprite, ABC):
         self.frame_count = 0
         self.frames_per_update = 5
         self.change_y = -ICON_SPEED
-        self.hit_sound = arcade.Sound("audio/sounds/collect_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/collect_icon_tone.wav")
 
         self.images = []  # List of image files that will be converted to textures
         self.initialize_textures()  # Sub-classes possibly override other attributes,
@@ -1183,12 +1189,12 @@ class LengthenPaddleIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/lengthen_paddle_icon_1.png",
-                       "images/icons/lengthen_paddle_icon_2.png",
-                       "images/icons/lengthen_paddle_icon_3.png",
-                       "images/icons/lengthen_paddle_icon_4.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/lengthen_paddle_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/lengthen_paddle_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/lengthen_paddle_icon_3.png",
+                       f"{IMAGES_BASE_PATH}/icons/lengthen_paddle_icon_4.png"]
         super().initialize_textures()
-        self.hit_sound = arcade.Sound("audio/sounds/lengthen_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/lengthen_icon_tone.wav")
 
     def activate_icon_property(self):
         current_paddle = self.level.paddle
@@ -1217,12 +1223,12 @@ class ShortenPaddleIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/shorten_paddle_icon_1.png",
-                       "images/icons/shorten_paddle_icon_2.png",
-                       "images/icons/shorten_paddle_icon_3.png",
-                       "images/icons/shorten_paddle_icon_4.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/shorten_paddle_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/shorten_paddle_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/shorten_paddle_icon_3.png",
+                       f"{IMAGES_BASE_PATH}/icons/shorten_paddle_icon_4.png"]
         super().initialize_textures()
-        self.hit_sound = arcade.Sound("audio/sounds/shorten_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/shorten_icon_tone.wav")
 
     def activate_icon_property(self):
         current_paddle = self.level.paddle
@@ -1256,10 +1262,10 @@ class MagneticPaddleIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/magnetic_paddle_icon_1.png",
-                       "images/icons/magnetic_paddle_icon_2.png",
-                       "images/icons/magnetic_paddle_icon_3.png",
-                       "images/icons/magnetic_paddle_icon_4.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/magnetic_paddle_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/magnetic_paddle_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/magnetic_paddle_icon_3.png",
+                       f"{IMAGES_BASE_PATH}/icons/magnetic_paddle_icon_4.png"]
         super().initialize_textures()
 
     def activate_icon_property(self):
@@ -1275,14 +1281,14 @@ class BonusScoreIcon(Icon):
 
     def __init__(self, level: Level = None, **kwargs):
         super().__init__(level, **kwargs)
-        self.adding_bonus_sound = arcade.Sound("audio/sounds/adding_bonus_3.wav")
+        self.adding_bonus_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/adding_bonus_3.wav")
 
     def initialize_textures(self):
-        self.images = ["images/icons/bonus_score_icon_1.png",
-                       "images/icons/bonus_score_icon_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/bonus_score_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/bonus_score_icon_2.png"]
         super().initialize_textures()
         self.frames_per_update = 8
-        self.hit_sound = arcade.Sound("audio/sounds/bonus_score_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/bonus_score_icon_tone.wav")
 
     def activate_icon_property(self):
         self.level.window.score += 5000
@@ -1295,11 +1301,11 @@ class ShootingIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/shooting_icon_1.png",
-                       "images/icons/shooting_icon_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/shooting_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/shooting_icon_2.png"]
         super().initialize_textures()
         self.frames_per_update = 8
-        self.hit_sound = arcade.Sound("audio/sounds/shooting_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/shooting_icon_tone.wav")
 
     def activate_icon_property(self):
         self.level.paddle.activate_shooter = True
@@ -1311,10 +1317,10 @@ class SplitBallIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/split_ball_icon_1.png",
-                       "images/icons/split_ball_icon_2.png",
-                       "images/icons/split_ball_icon_3.png",
-                       "images/icons/split_ball_icon_4.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/split_ball_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/split_ball_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/split_ball_icon_3.png",
+                       f"{IMAGES_BASE_PATH}/icons/split_ball_icon_4.png"]
         super().initialize_textures()
         self.frames_per_update = 10
 
@@ -1328,11 +1334,11 @@ class BonusLifeIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/bonus_life_icon_1.png",
-                       "images/icons/bonus_life_icon_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/bonus_life_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/bonus_life_icon_2.png"]
         super().initialize_textures()
         self.frames_per_update = 10
-        self.hit_sound = arcade.Sound("audio/sounds/bonus_life_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/bonus_life_icon_tone.wav")
 
     def activate_icon_property(self):
         self.level.window.lives += 1
@@ -1344,16 +1350,16 @@ class SafetyBarrierIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/safety_barrier_icon_1.png",
-                       "images/icons/safety_barrier_icon_2.png",
-                       "images/icons/safety_barrier_icon_3.png",
-                       "images/icons/safety_barrier_icon_2.png",
-                       "images/icons/safety_barrier_icon_1.png",
-                       "images/icons/safety_barrier_icon_4.png",
-                       "images/icons/safety_barrier_icon_5.png",
-                       "images/icons/safety_barrier_icon_6.png",
-                       "images/icons/safety_barrier_icon_5.png",
-                       "images/icons/safety_barrier_icon_4.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_3.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_4.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_5.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_6.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_5.png",
+                       f"{IMAGES_BASE_PATH}/icons/safety_barrier_icon_4.png"]
         super().initialize_textures()
         self.frames_per_update = 3
 
@@ -1367,10 +1373,10 @@ class AdvanceLevelIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/advance_level_icon_1.png",
-                       "images/icons/advance_level_icon_2.png",
-                       "images/icons/advance_level_icon_3.png",
-                       "images/icons/advance_level_icon_4.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/advance_level_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/advance_level_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/advance_level_icon_3.png",
+                       f"{IMAGES_BASE_PATH}/icons/advance_level_icon_4.png"]
         super().initialize_textures()
         self.frames_per_update = 3
 
@@ -1386,11 +1392,11 @@ class SpeedUpBallsIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/speed_up_ball_icon_1.png",
-                       "images/icons/speed_up_ball_icon_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/speed_up_ball_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/speed_up_ball_icon_2.png"]
         super().initialize_textures()
         self.frames_per_update = 10
-        self.hit_sound = arcade.Sound("audio/sounds/speed_up_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/speed_up_icon_tone.wav")
 
     def activate_icon_property(self):
         self.level.paddle.is_magnetic = False
@@ -1406,11 +1412,11 @@ class SlowDownBallsIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/slow_down_ball_icon_1.png",
-                       "images/icons/slow_down_ball_icon_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/slow_down_ball_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/slow_down_ball_icon_2.png"]
         super().initialize_textures()
         self.frames_per_update = 10
-        self.hit_sound = arcade.Sound("audio/sounds/slow_down_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/slow_down_icon_tone.wav")
 
     def activate_icon_property(self):
         for ball in self.level.ball_list:
@@ -1423,13 +1429,13 @@ class InvinciBallIcon(Icon):
     """
 
     def initialize_textures(self):
-        self.images = ["images/icons/invincible_ball_icon_1.png",
-                       "images/icons/invincible_ball_icon_2.png",
-                       "images/icons/invincible_ball_icon_3.png",
-                       "images/icons/invincible_ball_icon_2.png"]
+        self.images = [f"{IMAGES_BASE_PATH}/icons/invincible_ball_icon_1.png",
+                       f"{IMAGES_BASE_PATH}/icons/invincible_ball_icon_2.png",
+                       f"{IMAGES_BASE_PATH}/icons/invincible_ball_icon_3.png",
+                       f"{IMAGES_BASE_PATH}/icons/invincible_ball_icon_2.png"]
         super().initialize_textures()
         self.frames_per_update = 8
-        self.hit_sound = arcade.Sound("audio/sounds/invincible_ball_icon_tone.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/invincible_ball_icon_tone.wav")
 
     def activate_icon_property(self):
         self.level.paddle.invincible_balls += 3
@@ -1437,7 +1443,7 @@ class InvinciBallIcon(Icon):
         # In case there are magnetic balls, change them to be invincible
         for ball in self.level.paddle.magnetic_ball_list:
             if not ball.is_invincible:
-                new_ball = ball.convert_to(MagneticInviciBall)
+                new_ball = ball.convert_to(MagneticInvinciBall)
                 self.level.paddle.magnetic_ball_list.append(new_ball)
                 self.level.paddle.magnetic_ball_list.remove(ball)
                 self.level.paddle.invincible_balls -= 1
@@ -1460,7 +1466,7 @@ class SafetyBarrier(Brick, arcade.SpriteSolidColor):
 
         self.center_x = self.level.boundary.center_x
         self.center_y = self.level.boundary.inner_bottom + 7
-        self.hit_sound = arcade.Sound("audio/sounds/hit_safety_barrier.wav")
+        self.hit_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/hit_safety_barrier.wav")
         self.is_safety_barrier = True
 
     def initialize_textures(self):
@@ -1473,7 +1479,7 @@ class Bullet(arcade.Sprite):
     """
 
     def __init__(self, level: Level, **kwargs):
-        super().__init__("images/icons/bullet.png", scale=0.7, **kwargs)
+        super().__init__(f"{IMAGES_BASE_PATH}/icons/bullet.png", scale=0.7, **kwargs)
         self.level = level
 
         self.center_x = self.level.paddle.center_x
