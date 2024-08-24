@@ -52,7 +52,7 @@ Sound Effects: [zapsplat.com](https://www.zapsplat.com/)
 5. Set up pre-commit
 
     ```cmd
-    pre=commit install
+    pre-commit install
     ```
 
 6. Run the game:
