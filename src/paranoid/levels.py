@@ -15,12 +15,15 @@ import os
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Union, Optional
-from arcade.gui import UIInputBox, UIManager
+from arcade.gui import UIInputText, UIManager
 from collections import namedtuple
+from pyglet.media import Player
+from pyglet import font
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
     from paranoid.main import ParanoidGame
+from typing import Optional
 
 # I programmed this specifically for the screen size I was working with
 # at the time (1536 x 864 pixels) - fullscreen TODO: Add support for different screen sizes
@@ -64,6 +67,12 @@ WHOOSH_SOUND = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/whoosh_1.wav")
 # Fonts: path to font .ttf files
 BGOTHL = f"{FONTS_BASE_PATH}/bgothl"  # BankGothic Lt BT
 BGOTHM = f"{FONTS_BASE_PATH}/bgothm"  # BankGothic Md BT
+
+font.add_directory(FONTS_BASE_PATH)
+BGOTHL = "BankGothic Lt BT"
+BGOTHM = "BankGothic Md BT"
+if font.have_font(BGOTHL) and font.have_font(BGOTHM):
+    print("Yes! We have these fonts")
 
 # Text-styling dictionaries
 DISPLAY_BLOCK_NUMBERS = {"color": (85, 255, 255),
@@ -513,6 +522,7 @@ class Level(arcade.View, ABC):
         self.shoot_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/shoot_bullet_sound.wav")
         self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/level_{self.window.level_number}"
                                              f"_music.mp3", streaming=True)
+        self.sound_player: Optional[Player] = None
 
         # Overwrite certain attributes if we are in a demo level
         if self.is_demo_level:
@@ -585,7 +595,7 @@ class Level(arcade.View, ABC):
         self.game_is_active = False
         self.level_complete = True
         self.elapsed_time = 0  # Reset the elapsed time
-        self.background_music.stop()
+        self.background_music.stop(self.sound_player)
 
         # Set the bonus score
         if len(self.bonus_collection_order) == 5:  # All bonus letters collected
@@ -610,7 +620,7 @@ class Level(arcade.View, ABC):
             self.lost_a_life = True
 
         self.elapsed_time = 0  # Reset the elapsed time
-        self.background_music.stop()
+        self.background_music.stop(self.sound_player)
         self.lost_a_life_sound.play(volume=NORMAL_VOLUME)
 
     def on_show(self):
@@ -618,7 +628,7 @@ class Level(arcade.View, ABC):
 
         # For demo level, don't bounce
         if self.is_demo_level:
-            self.background_music.play(volume=LOW_VOLUME)
+            self.sound_player = self.background_music.play(volume=LOW_VOLUME)
 
         # For normal level, bounce when showing the first time
         else:
@@ -626,10 +636,10 @@ class Level(arcade.View, ABC):
                 self.first_time_showing = False
                 self.window.show_view(BouncingIntroView(self))
             else:
-                self.background_music.play(volume=LOW_VOLUME)
+                self.sound_player = self.background_music.play(volume=LOW_VOLUME)
 
     def on_hide_view(self):
-        self.background_music.stop()
+        self.background_music.stop(self.sound_player)
 
     def on_update(self, delta_time: float):
         """
@@ -643,13 +653,13 @@ class Level(arcade.View, ABC):
             WHOOSH_SOUND.play(volume=NORMAL_VOLUME)
 
         # Loop the background music
-        if self.background_music.get_stream_position() == 0:
+        if self.sound_player is not None and self.background_music.get_stream_position(self.sound_player) == 0:
             # Background music stops if level is complete, lost a life or game over.
             # This prevents immediate restart of the background music.
             # Also prevents restart of music when exiting demo level.
             if not self.lost_a_life and not self.game_over and not self.level_complete and \
                     not self.is_demo_level:
-                self.background_music.play(volume=LOW_VOLUME)
+                self.sound_player = self.background_music.play(volume=LOW_VOLUME)
 
         # Only update if the game is in active mode
         if self.game_is_active:
@@ -675,7 +685,7 @@ class Level(arcade.View, ABC):
             ball = assets.NormalBall(self.boundary, self.brick_list, self)
             self.ball_list.append(ball)
 
-            self.background_music.play(volume=LOW_VOLUME)
+            self.sound_player = self.background_music.play(volume=LOW_VOLUME)
             self.lost_a_life = False
 
         # Pause for a while before switching to the next view
@@ -1633,6 +1643,7 @@ class FullscreenView(arcade.View):
         self.boundary = FullscreenBoundary()
         self.ball_list = arcade.SpriteList()
         self.brick_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
+        self.sound_player: Optional[Player] = None
 
         # Override in sub-classes
         self.background_music: Optional[arcade.Sound] = None
@@ -1668,10 +1679,11 @@ class FullscreenView(arcade.View):
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
-        self.background_music.play(volume=NORMAL_VOLUME)
+        self.sound_player = self.background_music.play(volume=NORMAL_VOLUME)
 
     def on_hide_view(self):
-        self.background_music.stop()
+        if self.sound_player is not None:
+            self.background_music.stop(self.sound_player)
 
     def on_update(self, delta_time: float):
         """
@@ -1680,8 +1692,8 @@ class FullscreenView(arcade.View):
         self.ball_list.on_update()
 
         # Loop the background music
-        if self.background_music.get_stream_position() == 0:
-            self.background_music.play(volume=NORMAL_VOLUME)
+        if self.sound_player is not None and self.background_music.get_stream_position(self.sound_player) == 0:
+            self.sound_player = self.background_music.play(volume=NORMAL_VOLUME)
 
     def on_draw(self):
         arcade.start_render()
@@ -1715,7 +1727,7 @@ class GameIntroView(FullscreenView):
             self.first_time_showing = False
             self.window.show_view(BouncingIntroView(self))
         else:
-            self.background_music.play(volume=NORMAL_VOLUME)
+            self.sound_player = self.background_music.play(volume=NORMAL_VOLUME)
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
@@ -1885,9 +1897,16 @@ class NameEntryView(arcade.View):
         self.window = window
 
         self.ui_manager = UIManager()
-        self.ui_manager.purge_ui_elements()
+        self.ui_manager.enable()
 
-        self.name_entry_box = UIInputBox(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 450, 50)
+        width = 450
+        height = 50
+        self.name_entry_box = UIInputText(
+            (SCREEN_WIDTH / 2) - (width / 2),
+            (SCREEN_HEIGHT / 2 - (height / 2)),
+            width=width,
+            height=height,
+        )
         self.name_entry_box.set_style_attrs(font_name=BGOTHL, font_size=30,
                                             font_color=arcade.color.WHITE,
                                             font_color_hover=arcade.color.WHITE,
@@ -1899,8 +1918,8 @@ class NameEntryView(arcade.View):
                                             bg_color_hover=arcade.color.BLACK,
                                             bg_color_focus=arcade.color.BLACK,
                                             vmargin=10, margin_left=5)
-        self.name_entry_box._focused = True  # Set it to always focus
-        self.ui_manager.add_ui_element(self.name_entry_box)
+        self.name_entry_box._active = True  # Set it to always focus
+        self.ui_manager.add(self.name_entry_box)
 
         self.border_list = arcade.SpriteList(is_static=True)
         self.border_list.append(arcade.Sprite(f"{IMAGES_BASE_PATH}/boundaries/confirmation_dialogue_boundary.png",
@@ -1923,8 +1942,8 @@ class NameEntryView(arcade.View):
                          **BONUS_NOT_COLLECTED)
 
         # If not focused, focus on it
-        if not self.name_entry_box.focused:
-            self.name_entry_box._focused = True
+        if not self.name_entry_box._active:
+            self.name_entry_box._active = True
 
     def on_key_press(self, symbol: int, modifiers: int):
         global HIGH_SCORES
@@ -1943,7 +1962,7 @@ class NameEntryView(arcade.View):
                                            f"{time.asctime()}\n")
 
                 # Remove the input box and reset the high scores list
-                self.ui_manager.purge_ui_elements()
+                self.ui_manager.clear()
                 HIGH_SCORES = get_high_scores()
 
                 # If we have a new high score, play the high score voice
@@ -1979,6 +1998,7 @@ class HowToPlayView(arcade.View):
         self.invalid_page_sound = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/no_next_item_tone.wav")
         self.background_music = arcade.Sound(f"{AUDIO_BASE_PATH}/background_music/how_to_play_music.mp3",
                                              streaming=True)
+        self.sound_player: Optional[Player] = None
 
         self.center_x = SCREEN_WIDTH / 2
         self.line_width = 40  # Pixels from one line to another
@@ -2034,10 +2054,10 @@ class HowToPlayView(arcade.View):
 
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
-        self.background_music.play(volume=NORMAL_VOLUME)
+        self.sound_player = self.background_music.play(volume=NORMAL_VOLUME)
 
     def on_hide_view(self):
-        self.background_music.stop()
+        self.background_music.stop(self.sound_player)
         WHOOSH_SOUND.play(volume=NORMAL_VOLUME)
 
     def draw_page_0(self):
@@ -2123,7 +2143,7 @@ class HowToPlayView(arcade.View):
 
     def on_update(self, delta_time: float):
         # Loop the background music
-        if self.background_music.get_stream_position() == 0:
+        if self.background_music.get_stream_position(self.sound_player) == 0:
             self.background_music.play(volume=NORMAL_VOLUME)
 
     def on_draw(self):
