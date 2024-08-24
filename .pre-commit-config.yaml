@@ -1,0 +1,76 @@
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: pretty-format-json
+        args: [--autofix, --indent=4, --no-ensure-ascii, --no-sort-keys]
+      - id: check-ast
+      - id: debug-statements
+      - id: check-docstring-first
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: detect-private-key
+      - id: name-tests-test
+        args: [--pytest-test-first]
+      # - id: check-illegal-windows-names
+      - id: requirements-txt-fixer
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.2
+    hooks:
+      - id: ruff
+        types_or: [ python, pyi ]
+        args: [ --fix ]
+      - id: ruff-format
+        types_or: [ python, pyi ]
+
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+      - id: black-jupyter
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.17.0
+    hooks:
+    - id: pyupgrade
+      args: [--py310-plus]
+
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+      - id: add-trailing-comma
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.41.0
+    hooks:
+      - id: markdownlint
+        language_version: 20.10.0
+      - id: markdownlint-fix
+
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+
+  - repo: https://github.com/python-poetry/poetry
+    rev: 1.8.0
+    hooks:
+      - id: poetry-check
+      - id: poetry-lock
+        args: [--check, --no-update]

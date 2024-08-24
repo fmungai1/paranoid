@@ -17,3 +17,34 @@ pre-commit = "^3.8.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+unfixable = [
+    "ERA",  # do not autoremove commmented out code
+]
+target-version = "py310"
+line-length = 88
+extend-select = [
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "ERA",  # flake8-eradicate/eradicate
+    "N",    # pep8-naming
+    "PIE",  # flake8-pie
+    "PGH",  # pygrep
+    "RUF",  # ruff checks
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "TID",  # flake8-tidy-imports
+    "UP",   # pyupgrade
+]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.black]
+target-version = ["py310"]
+preview = true
+
+[tool.isort]
+profile = "black"
+force_grid_wrap = 2

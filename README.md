@@ -1,7 +1,7 @@
 # Paranoid
 
-This is a remake of the classic [Paranoid game](https://archive.org/details/msdos_Paranoid_shareware) (1993)
-created by The Bit Bucket Brothers (Ben and Tom North).
+This is a remake of the classic [Paranoid game](https://archive.org/details/msdos_Paranoid_shareware)
+(1993) created by The Bit Bucket Brothers (Ben and Tom North).
 
 The game is designed for 1536 x 864 screen resolution - fullscreen.
 
@@ -35,7 +35,7 @@ Sound Effects: [zapsplat.com](https://www.zapsplat.com/)
     cd paranoid
     ```
 
-2. Create and activate virtual environment
+3. Create and activate virtual environment
 
     ```cmd
     poetry env use <path/to/Python310/python.exe>
@@ -43,13 +43,19 @@ Sound Effects: [zapsplat.com](https://www.zapsplat.com/)
     poetry shell
     ```
 
-3. Install all dependencies
+4. Install all dependencies
 
     ```cmd
     poetry install
     ```
 
-4. Run the game:
+5. Set up pre-commit
+
+    ```cmd
+    pre=commit install
+    ```
+
+6. Run the game:
 
     ```cmd
     python src\paranoid\main.py
