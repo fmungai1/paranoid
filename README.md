@@ -7,9 +7,9 @@ The game is designed for 1536 x 864 screen resolution - fullscreen.
 
 ## Dependencies
 
-Python: 3.8.10
+Python: 3.10.4
 
-[Arcade](https://api.arcade.academy/en/latest/): 2.4.2
+[Arcade](https://api.arcade.academy/en/latest/): 2.6.17
 
 ## Resources
 
@@ -38,7 +38,7 @@ Sound Effects: [zapsplat.com](https://www.zapsplat.com/)
 2. Create and activate virtual environment
 
     ```cmd
-    poetry env use <path/to/Python38/python.exe>
+    poetry env use <path/to/Python310/python.exe>
 
     poetry shell
     ```
