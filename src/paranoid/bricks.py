@@ -24,7 +24,7 @@ from paranoid.levels import Level
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
-    from paranoid.assets import Icon
+    from paranoid.icons import Icon
 
 
 class Brick(arcade.Sprite, ABC):

@@ -20,22 +20,9 @@ import pyglet
 import pyglet.media
 
 from paranoid.assets import (
-    AdvanceLevelIcon,
-    BonusLifeIcon,
-    BonusScoreIcon,
     Bullet,
     DemoNormalPaddle,
-    Icon,
-    InvinciBallIcon,
-    LengthenPaddleIcon,
-    MagneticPaddleIcon,
     NormalPaddle,
-    SafetyBarrierIcon,
-    ShootingIcon,
-    ShortenPaddleIcon,
-    SlowDownBallsIcon,
-    SpeedUpBallsIcon,
-    SplitBallIcon,
 )
 from paranoid.balls import (
     Ball,
@@ -128,6 +115,21 @@ from paranoid.constants import (
     TRANSITION_TIME,
     VELOCITY_RETAINED,
     WHOOSH_SOUND,
+)
+from paranoid.icons import (
+    AdvanceLevelIcon,
+    BonusLifeIcon,
+    BonusScoreIcon,
+    Icon,
+    InvinciBallIcon,
+    LengthenPaddleIcon,
+    MagneticPaddleIcon,
+    SafetyBarrierIcon,
+    ShootingIcon,
+    ShortenPaddleIcon,
+    SlowDownBallsIcon,
+    SpeedUpBallsIcon,
+    SplitBallIcon,
 )
 
 # Prevents circular import error by setting this variable False at runtime
