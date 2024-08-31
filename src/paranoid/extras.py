@@ -1,15 +1,12 @@
 """
-Defines assets required in the game such as balls, paddles, bricks and icons.
+Extra sprites used in the game.
 
-Assets created using MS Paint app. Image transparency of balls achieved using
-MS Powerpoint app.
-
-Images for flags downloaded from: https://www.countryflags.com/ and resized using MS Paint app
+Assets created using MS Paint app
 Colors obtained using color picker on the original game
 """
 
 # Allows specifying of type checking hints without having to use string literals,
-# e.g "Boundary" in Ball __init__ method
+# e.g "Level" in SafetyBarrier `__init__` method
 from __future__ import annotations
 
 from typing import (
@@ -29,13 +26,6 @@ from paranoid.constants import (
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
     from paranoid.levels import Level
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-#                                              EXTRAS
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 class SafetyBarrier(Brick, arcade.SpriteSolidColor):

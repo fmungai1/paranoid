@@ -5,14 +5,18 @@ Created using MS Paint app
 Colors obtained using color picker on the original game
 """
 
+# Allows specifying of type checking hints without having to use string literals,
+# e.g "Level" in Icon `__init__` method
+from __future__ import annotations
+
 from abc import (
     ABC,
     abstractmethod,
 )
+from typing import TYPE_CHECKING
 
 import arcade
 
-from paranoid.assets import SafetyBarrier
 from paranoid.balls import (
     InvinciBall,
     MagneticInvinciBall,
@@ -24,7 +28,7 @@ from paranoid.constants import (
     IMAGES_BASE_PATH,
     NORMAL_VOLUME,
 )
-from paranoid.levels import Level
+from paranoid.extras import SafetyBarrier
 from paranoid.paddles import (
     DemoLongPaddle,
     DemoNormalPaddle,
@@ -33,6 +37,10 @@ from paranoid.paddles import (
     NormalPaddle,
     ShortPaddle,
 )
+
+# Prevents circular import error by setting this variable False at runtime
+if TYPE_CHECKING:
+    from paranoid.levels import Level
 
 
 class Icon(arcade.Sprite, ABC):

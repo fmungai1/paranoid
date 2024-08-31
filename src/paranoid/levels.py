@@ -19,7 +19,6 @@ import arcade.gui
 import pyglet
 import pyglet.media
 
-from paranoid.assets import Bullet
 from paranoid.balls import (
     Ball,
     NormalBall,
@@ -112,6 +111,7 @@ from paranoid.constants import (
     VELOCITY_RETAINED,
     WHOOSH_SOUND,
 )
+from paranoid.extras import Bullet
 from paranoid.icons import (
     AdvanceLevelIcon,
     BonusLifeIcon,
