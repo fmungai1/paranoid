@@ -7,6 +7,10 @@ Images for flags downloaded from: https://www.countryflags.com/ and resized usin
 Colors obtained using color picker on the original game
 """
 
+# Allows specifying of type checking hints without having to use string literals,
+# e.g "Level" in Brick `__init__` method
+from __future__ import annotations
+
 from abc import (
     ABC,
     abstractmethod,
@@ -20,11 +24,11 @@ from paranoid.constants import (
     IMAGES_BASE_PATH,
     NORMAL_VOLUME,
 )
-from paranoid.levels import Level
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
     from paranoid.icons import Icon
+    from paranoid.levels import Level
 
 
 class Brick(arcade.Sprite, ABC):

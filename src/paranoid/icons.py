@@ -12,15 +12,7 @@ from abc import (
 
 import arcade
 
-from paranoid.assets import (
-    DemoLongPaddle,
-    DemoNormalPaddle,
-    DemoShortPaddle,
-    LongPaddle,
-    NormalPaddle,
-    SafetyBarrier,
-    ShortPaddle,
-)
+from paranoid.assets import SafetyBarrier
 from paranoid.balls import (
     InvinciBall,
     MagneticInvinciBall,
@@ -33,6 +25,14 @@ from paranoid.constants import (
     NORMAL_VOLUME,
 )
 from paranoid.levels import Level
+from paranoid.paddles import (
+    DemoLongPaddle,
+    DemoNormalPaddle,
+    DemoShortPaddle,
+    LongPaddle,
+    NormalPaddle,
+    ShortPaddle,
+)
 
 
 class Icon(arcade.Sprite, ABC):

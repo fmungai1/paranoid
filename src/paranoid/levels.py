@@ -19,11 +19,7 @@ import arcade.gui
 import pyglet
 import pyglet.media
 
-from paranoid.assets import (
-    Bullet,
-    DemoNormalPaddle,
-    NormalPaddle,
-)
+from paranoid.assets import Bullet
 from paranoid.balls import (
     Ball,
     NormalBall,
@@ -130,6 +126,10 @@ from paranoid.icons import (
     SlowDownBallsIcon,
     SpeedUpBallsIcon,
     SplitBallIcon,
+)
+from paranoid.paddles import (
+    DemoNormalPaddle,
+    NormalPaddle,
 )
 
 # Prevents circular import error by setting this variable False at runtime
