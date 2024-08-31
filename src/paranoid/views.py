@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING
 
 import arcade
 
+# Prevent circular import error with levels.py https://stackoverflow.com/a/746067
+import paranoid.levels
 from paranoid.balls import NormalBall
 from paranoid.boundaries import FullscreenBoundary
 from paranoid.bricks import (
@@ -103,10 +105,6 @@ from paranoid.icons import (
     SpeedUpBallsIcon,
     SplitBallIcon,
 )
-from paranoid.levels import (
-    Level,
-    Level1,
-)
 from paranoid.utilities import get_high_scores
 
 # Prevents circular import error by setting this variable False at runtime
@@ -119,7 +117,7 @@ if TYPE_CHECKING:
 class BouncingIntroView(arcade.View):
     """Introduce the game-intro and level views by bouncing several times."""
 
-    def __init__(self, view: Level | GameIntroView):
+    def __init__(self, view: paranoid.levels.Level | GameIntroView):
         """Initialize view attributes."""
         super().__init__()
 
@@ -139,7 +137,7 @@ class BouncingIntroView(arcade.View):
 
         # Only load the level intro voice in a level because in GameIntroView,
         # level number is 0
-        if isinstance(self.view, Level):
+        if isinstance(self.view, paranoid.levels.Level):
             self.level_intro_voice = arcade.Sound(
                 f"{AUDIO_BASE_PATH}/sounds/level_"
                 f"{self.view.window.level_number}_voice.wav",
@@ -159,7 +157,7 @@ class BouncingIntroView(arcade.View):
         # Pause for a while before bouncing in a level view
         if (
             isinstance(self.view, GameIntroView)
-            or isinstance(self.view, Level)
+            or isinstance(self.view, paranoid.levels.Level)
             and self.elapsed_time > PAUSE_TIME + TRANSITION_TIME * 2
         ):
             self.bottom += self.change_y
@@ -186,7 +184,7 @@ class BouncingIntroView(arcade.View):
 
         # Only draw this when we are in a level
         if (
-            isinstance(self.view, Level)
+            isinstance(self.view, paranoid.levels.Level)
             and TRANSITION_TIME <= self.elapsed_time < PAUSE_TIME + TRANSITION_TIME
         ):
             arcade.draw_scaled_texture_rectangle(
@@ -209,7 +207,7 @@ class BouncingIntroView(arcade.View):
 
         # Play the second whoosh sound as we stop displaying level info text
         elif (
-            isinstance(self.view, Level)
+            isinstance(self.view, paranoid.levels.Level)
             and self.elapsed_time >= PAUSE_TIME + TRANSITION_TIME
         ):
             if not self.second_whoosh_sound_played:
@@ -220,7 +218,7 @@ class BouncingIntroView(arcade.View):
 class LevelOutroView(arcade.View):
     """Exits a level by moving the screen up, then initiates a new level if one exists."""
 
-    def __init__(self, level: Level):
+    def __init__(self, level: paranoid.levels.Level):
         """Initialize attributes."""
         super().__init__()
 
@@ -468,7 +466,7 @@ class MainMenuView(FullscreenView):
             # New game
             if self.selected == 0:
                 self.window.reset_game()
-                self.window.show_view(Level1(self.window))
+                self.window.show_view(paranoid.levels.Level1(self.window))
 
             # How to play
             elif self.selected == 1:
@@ -1029,7 +1027,7 @@ class HowToPlayView(arcade.View):
 class PauseMenuView(arcade.View):
     """Pause menu view inside a level."""
 
-    def __init__(self, level: Level):
+    def __init__(self, level: paranoid.levels.Level):
         """Initialize attributes."""
         super().__init__()
         self.level = level
@@ -1265,7 +1263,7 @@ class NewGameConfirmationView(ConfirmationDialogueView):
     def yes_command(self):
         """Reset all progress and start a new game at Level 1."""
         self.view.window.reset_game()
-        self.window.show_view(Level1(self.window))
+        self.window.show_view(paranoid.levels.Level1(self.window))
 
 
 class MainMenuConfirmationView(ConfirmationDialogueView):

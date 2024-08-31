@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING
 import arcade
 import arcade.gui
 
+# Prevent circular import error with views.py https://stackoverflow.com/a/746067
+import paranoid.views
 from paranoid.balls import (
     Ball,
     NormalBall,
@@ -96,14 +98,6 @@ from paranoid.paddles import (
     NormalPaddle,
 )
 from paranoid.utilities import get_high_scores
-from paranoid.views import (
-    BouncingIntroView,
-    HighScoreView,
-    LevelOutroView,
-    MainMenuView,
-    NameEntryView,
-    PauseMenuView,
-)
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
@@ -312,7 +306,7 @@ class Level(arcade.View, ABC):
         else:
             if self.first_time_showing:
                 self.first_time_showing = False
-                self.window.show_view(BouncingIntroView(self))
+                self.window.show_view(paranoid.views.BouncingIntroView(self))
             else:
                 self.sound_player = self.background_music.play(volume=LOW_VOLUME)
 
@@ -326,7 +320,7 @@ class Level(arcade.View, ABC):
 
         # If we are in a demo level, display for some time then return to main menu
         if self.is_demo_level and self.elapsed_time > DEMO_LEVEL_TIME:
-            self.window.show_view(MainMenuView(self.window))
+            self.window.show_view(paranoid.views.MainMenuView(self.window))
             WHOOSH_SOUND.play(volume=NORMAL_VOLUME)
 
         # Loop the background music
@@ -378,9 +372,9 @@ class Level(arcade.View, ABC):
         ):
             # Check if we can get into the high scores list
             if self.window.score > HIGH_SCORES[-1].score:
-                self.window.show_view(NameEntryView(self.window))
+                self.window.show_view(paranoid.views.NameEntryView(self.window))
             else:
-                self.window.show_view(HighScoreView(self.window))
+                self.window.show_view(paranoid.views.HighScoreView(self.window))
 
             WHOOSH_SOUND.play(volume=NORMAL_VOLUME)
 
@@ -404,7 +398,7 @@ class Level(arcade.View, ABC):
             self.load_next_level
             and self.elapsed_time > self.elapsed_time_copy + PAUSE_TIME - 1
         ):
-            self.window.show_view(LevelOutroView(self))
+            self.window.show_view(paranoid.views.LevelOutroView(self))
 
     def on_draw(self):
         """Draw all sprites in a level."""
@@ -476,7 +470,7 @@ class Level(arcade.View, ABC):
         """Process user key-press actions."""
         # If we are in a demo level, return to main menu
         if self.is_demo_level:
-            self.window.show_view(MainMenuView(self.window))
+            self.window.show_view(paranoid.views.MainMenuView(self.window))
             WHOOSH_SOUND.play(volume=NORMAL_VOLUME)
 
         # Normal game play
@@ -509,7 +503,7 @@ class Level(arcade.View, ABC):
                 and not self.game_over
                 and not self.level_complete
             ):
-                self.window.show_view(PauseMenuView(self))
+                self.window.show_view(paranoid.views.PauseMenuView(self))
                 WHOOSH_SOUND.play(volume=NORMAL_VOLUME)
 
                 # Prevent paddle from moving after un-pausing if left or right key was pressed
