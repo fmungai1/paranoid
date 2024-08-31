@@ -12,204 +12,128 @@ from abc import (
     abstractmethod,
 )
 from collections import namedtuple
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import arcade
-from arcade.gui import (
-    UIInputText,
-    UIManager,
-)
-from pyglet import font
+import arcade.gui
+import pyglet
+import pyglet.media
 
-import paranoid.assets as assets
+from paranoid.assets import (
+    AdvanceLevelIcon,
+    AquaBrick,
+    AquaLineBrick,
+    Ball,
+    BBBBrick,
+    BlueBrick,
+    BlueLineBrick,
+    BonusBBrick,
+    BonusLifeIcon,
+    BonusNBrick,
+    BonusOBrick,
+    BonusSBrick,
+    BonusScoreIcon,
+    BonusUBrick,
+    Brick,
+    Bullet,
+    CupBrick,
+    DemoNormalPaddle,
+    FNMBrick,
+    FrowningBrick,
+    GreenBrick,
+    GreenLineBrick,
+    GreyBrick,
+    GreyLineBrick,
+    HighScoresBrick,
+    Icon,
+    InvinciBallIcon,
+    KenyanFlagBrick,
+    LeaderBoardBrick,
+    LeftPointingGreyBrick,
+    LengthenPaddleIcon,
+    MagneticPaddleIcon,
+    MenuBrick,
+    MultiColouredBrick1,
+    MultiColouredBrick2,
+    MultiColouredBrick3,
+    MultiColouredBrick4,
+    NormalBall,
+    NormalPaddle,
+    NormalWallBrick,
+    ParanoidIntroBrick,
+    PinkBrick1,
+    PinkBrick2,
+    RedBlueBrick1,
+    RedBlueBrick2,
+    RedBrick,
+    RedLineBrick,
+    RightPointingGreyBrick,
+    RightWallBrick,
+    SafetyBarrierIcon,
+    ShootingIcon,
+    ShortenPaddleIcon,
+    SlowDownBallsIcon,
+    SmilingBrick,
+    SpeedUpBallsIcon,
+    SplitBallIcon,
+    UKFlagBrick,
+    UnbreakableBrick,
+)
+from paranoid.constants import (
+    AUDIO_BASE_PATH,
+    BGOTHL,
+    BGOTHM,
+    BONUS_COLLECTED,
+    BONUS_NOT_COLLECTED,
+    BOUNDARY_THICKNESS,
+    BRICK_HEIGHT,
+    BRICK_MARGIN,
+    BRICK_WIDTH,
+    CONFIRMATION_DIALOGUE_TEXT,
+    DEMO_LEVEL_TIME,
+    DEMO_TEXT,
+    DISPLAY_BLOCK_NUMBERS,
+    DISPLAY_BLOCK_TEXT,
+    DISPLAY_BLOCK_TEXT_KEY,
+    ENTER_NAME_HEADING,
+    ENTER_SOUND,
+    FONTS_BASE_PATH,
+    GRAVITY,
+    HIGH_SCORES_FILE,
+    HIGH_SCORES_HEADING,
+    HIGH_SCORES_NAMES,
+    HIGH_SCORES_NUMBERS,
+    HOW_TO_PLAY_NEXT_BACK,
+    HOW_TO_PLAY_TEXT,
+    IMAGES_BASE_PATH,
+    LEADER_BOARD_HEADING,
+    LEVEL_INFO_TEXT,
+    LOW_VOLUME,
+    MAX_BOUNCES,
+    MENU_TEXT_HEADING,
+    MENU_TEXT_NORMAL,
+    MENU_TEXT_SELECTED,
+    NORMAL_VOLUME,
+    PAUSE_TIME,
+    PLAYING_FIELD_WIDTH,
+    RANDOM_BALLS,
+    SCREEN_HEIGHT,
+    SCREEN_PADDING,
+    SCREEN_WIDTH,
+    SCROLL_SOUND,
+    TRANSITION_TIME,
+    VELOCITY_RETAINED,
+    WHOOSH_SOUND,
+)
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
-    from pyglet.media import Player
-
     from paranoid.main import ParanoidGame
 
 
-# I programmed this specifically for the screen size I was working with
-# at the time (1536 x 864 pixels) - fullscreen TODO: Add support for different screen sizes
-SCREEN_WIDTH = 1536
-SCREEN_HEIGHT = 864
-
-# All the images drawn are based on these constants. Changing these constants will
-# require redrawing all the images!!
-SCREEN_PADDING = 10
-BOUNDARY_THICKNESS = 25
-PLAYING_FIELD_WIDTH = 1080  # Playing field height is calculated from screen height
-BRICK_WIDTH = 75
-BRICK_HEIGHT = 25
-BRICK_MARGIN = 2
-COLUMNS = 14  # Number of columns on the playing field
-
-PAUSE_TIME = 3
-TRANSITION_TIME = 1
-DEMO_LEVEL_TIME = 12
-RANDOM_BALLS = 10
-NORMAL_VOLUME = 0.3
-LOW_VOLUME = 0.1
-
-# Bouncing constants
-MAX_BOUNCES = 3
-GRAVITY = 0.4
-VELOCITY_RETAINED = 0.7
-
-# Assets
-ASSETS_BASE_PATH = Path(__file__).parent.parent.parent / "assets"
-IMAGES_BASE_PATH = ASSETS_BASE_PATH / "images"
-AUDIO_BASE_PATH = ASSETS_BASE_PATH / "audio"
-FONTS_BASE_PATH = ASSETS_BASE_PATH / "fonts"
-HIGH_SCORES_FILE = ASSETS_BASE_PATH / "high_scores.txt"
-
-# Global Sounds
-ENTER_SOUND = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/press_enter.wav")
-SCROLL_SOUND = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/scroll_options.wav")
-WHOOSH_SOUND = arcade.Sound(f"{AUDIO_BASE_PATH}/sounds/whoosh_1.wav")
-
-# Fonts: path to font .ttf files
-BGOTHL = f"{FONTS_BASE_PATH}/bgothl"  # BankGothic Lt BT
-BGOTHM = f"{FONTS_BASE_PATH}/bgothm"  # BankGothic Md BT
-
-font.add_directory(FONTS_BASE_PATH)
-BGOTHL = "BankGothic Lt BT"
-BGOTHM = "BankGothic Md BT"
-if font.have_font(BGOTHL) and font.have_font(BGOTHM):
+pyglet.font.add_directory(FONTS_BASE_PATH)
+if pyglet.font.have_font(BGOTHL) and pyglet.font.have_font(BGOTHM):
     print("Yes! We have these fonts")
-
-# Text-styling dictionaries
-DISPLAY_BLOCK_NUMBERS = {
-    "color": (85, 255, 255),
-    "font_size": 30,
-    "font_name": BGOTHL,
-    "anchor_x": "right",
-}
-
-DISPLAY_BLOCK_TEXT = {
-    "color": (0, 0, 170),
-    "font_size": 30,
-    "font_name": BGOTHL,
-    "width": 280,
-    "align": "center",
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-DEMO_TEXT = {
-    "color": (150, 150, 150),
-    "font_size": 80,
-    "font_name": BGOTHM,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-DISPLAY_BLOCK_TEXT_KEY = DISPLAY_BLOCK_TEXT.copy()
-DISPLAY_BLOCK_TEXT_KEY.update(color=(170, 0, 0))
-
-BONUS_NOT_COLLECTED = {
-    "color": (170, 170, 170),
-    "font_size": 30,
-    "font_name": BGOTHL,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-BONUS_COLLECTED = {
-    "color": (85, 255, 85),
-    "font_size": 35,
-    "font_name": BGOTHM,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-LEVEL_INFO_TEXT = {
-    "color": (215, 215, 215),
-    "font_size": 40,
-    "font_name": BGOTHM,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-MENU_TEXT_HEADING = {
-    "color": (255, 85, 85),
-    "font_size": 65,
-    "font_name": BGOTHM,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-MENU_TEXT_NORMAL = {
-    "color": (215, 215, 215),
-    "font_size": 40,
-    "font_name": BGOTHL,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-MENU_TEXT_SELECTED = {
-    "color": (85, 255, 255),
-    "font_size": 50,
-    "font_name": BGOTHM,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-ENTER_NAME_HEADING = MENU_TEXT_HEADING.copy()
-ENTER_NAME_HEADING.update(font_size=50)
-
-CONFIRMATION_DIALOGUE_TEXT = {
-    "color": (215, 215, 215),
-    "font_size": 30,
-    "font_name": BGOTHL,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-LEADER_BOARD_HEADING = {
-    "color": (170, 0, 0),
-    "font_size": 100,
-    "font_name": BGOTHM,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-HIGH_SCORES_HEADING = {
-    "color": (0, 0, 170),
-    "font_size": 30,
-    "font_name": BGOTHM,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-HIGH_SCORES_NUMBERS = {
-    "color": arcade.color.BLACK,
-    "font_size": 20,
-    "font_name": BGOTHL,
-    "anchor_x": "right",
-    "anchor_y": "center",
-}
-
-HIGH_SCORES_NAMES = {
-    "color": arcade.color.BLACK,
-    "font_size": 20,
-    "font_name": BGOTHL,
-    "anchor_x": "left",
-    "anchor_y": "center",
-}
-
-HOW_TO_PLAY_TEXT = {
-    "color": (85, 255, 85),
-    "font_size": 30,
-    "font_name": BGOTHL,
-    "anchor_x": "center",
-    "anchor_y": "center",
-}
-
-HOW_TO_PLAY_NEXT_BACK = MENU_TEXT_HEADING.copy()
-HOW_TO_PLAY_NEXT_BACK.update(font_size=50)
 
 
 def create_high_scores():
@@ -493,55 +417,55 @@ class DemoDisplayInfoBlock:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Shortened names for brick classes to be used in populating the grid (4 chars per brick)
-RED_ = assets.RedBrick
-BLUE = assets.BlueBrick
-GRN_ = assets.GreenBrick
-AQUA = assets.AquaBrick
-GREY = assets.GreyBrick
-REDL = assets.RedLineBrick
-BLUL = assets.BlueLineBrick
-GRNL = assets.GreenLineBrick
-AQUL = assets.AquaLineBrick
-GRYL = assets.GreyLineBrick
-PINK = assets.PinkBrick2
-PNK1 = assets.PinkBrick1
-REDB = assets.RedBlueBrick2
-RDB1 = assets.RedBlueBrick1
-MUL4 = assets.MultiColouredBrick4
-MUL3 = assets.MultiColouredBrick3
-MUL2 = assets.MultiColouredBrick2
-MUL1 = assets.MultiColouredBrick1
-UK__ = assets.UKFlagBrick
-KNYA = assets.KenyanFlagBrick
-CUP_ = assets.CupBrick
-BBB_ = assets.BBBBrick
-FNM_ = assets.FNMBrick
-HAPY = assets.SmilingBrick
-SAD_ = assets.FrowningBrick
-LGRY = assets.LeftPointingGreyBrick
-RGRY = assets.RightPointingGreyBrick
-NWAL = assets.NormalWallBrick
-RWAL = assets.RightWallBrick
-BLOK = assets.UnbreakableBrick
-BONB = assets.BonusBBrick
-BONO = assets.BonusOBrick
-BONN = assets.BonusNBrick
-BONU = assets.BonusUBrick
-BONS = assets.BonusSBrick
+RED_ = RedBrick
+BLUE = BlueBrick
+GRN_ = GreenBrick
+AQUA = AquaBrick
+GREY = GreyBrick
+REDL = RedLineBrick
+BLUL = BlueLineBrick
+GRNL = GreenLineBrick
+AQUL = AquaLineBrick
+GRYL = GreyLineBrick
+PINK = PinkBrick2
+PNK1 = PinkBrick1
+REDB = RedBlueBrick2
+RDB1 = RedBlueBrick1
+MUL4 = MultiColouredBrick4
+MUL3 = MultiColouredBrick3
+MUL2 = MultiColouredBrick2
+MUL1 = MultiColouredBrick1
+UK__ = UKFlagBrick
+KNYA = KenyanFlagBrick
+CUP_ = CupBrick
+BBB_ = BBBBrick
+FNM_ = FNMBrick
+HAPY = SmilingBrick
+SAD_ = FrowningBrick
+LGRY = LeftPointingGreyBrick
+RGRY = RightPointingGreyBrick
+NWAL = NormalWallBrick
+RWAL = RightWallBrick
+BLOK = UnbreakableBrick
+BONB = BonusBBrick
+BONO = BonusOBrick
+BONN = BonusNBrick
+BONU = BonusUBrick
+BONS = BonusSBrick
 
 # Shortened names for icon classes to be used in populating the icons list
-LENGTHEN = assets.LengthenPaddleIcon
-SHORTEN = assets.ShortenPaddleIcon
-MAGNET = assets.MagneticPaddleIcon
-SCORE = assets.BonusScoreIcon
-SHOOT = assets.ShootingIcon
-SPLIT = assets.SplitBallIcon
-LIFE = assets.BonusLifeIcon
-SAFETY = assets.SafetyBarrierIcon
-ADVANCE = assets.AdvanceLevelIcon
-SPEED = assets.SpeedUpBallsIcon
-SLOW = assets.SlowDownBallsIcon
-INVINCIBLE = assets.InvinciBallIcon
+LENGTHEN = LengthenPaddleIcon
+SHORTEN = ShortenPaddleIcon
+MAGNET = MagneticPaddleIcon
+SCORE = BonusScoreIcon
+SHOOT = ShootingIcon
+SPLIT = SplitBallIcon
+LIFE = BonusLifeIcon
+SAFETY = SafetyBarrierIcon
+ADVANCE = AdvanceLevelIcon
+SPEED = SpeedUpBallsIcon
+SLOW = SlowDownBallsIcon
+INVINCIBLE = InvinciBallIcon
 
 
 class Level(arcade.View, ABC):
@@ -560,9 +484,9 @@ class Level(arcade.View, ABC):
         self.breakable_brick_list = (
             arcade.SpriteList()
         )  # Only used to check if level is complete
-        self.ball_list: list[assets.Ball] | arcade.SpriteList = arcade.SpriteList()
-        self.icon_list: list[assets.Icon] | arcade.SpriteList = arcade.SpriteList()
-        self.bullet_list: list[assets.Bullet] | arcade.SpriteList = arcade.SpriteList()
+        self.ball_list: list[Ball] | arcade.SpriteList = arcade.SpriteList()
+        self.icon_list: list[Icon] | arcade.SpriteList = arcade.SpriteList()
+        self.bullet_list: list[Bullet] | arcade.SpriteList = arcade.SpriteList()
 
         # Sprites and textures
         self.boundary = PlayingFieldBoundary()
@@ -570,9 +494,9 @@ class Level(arcade.View, ABC):
         self.level_info_boundary = arcade.load_texture(
             f"{IMAGES_BASE_PATH}/boundaries/level_info_boundary.png",
         )
-        self.paddle = assets.NormalPaddle(level=self)
+        self.paddle = NormalPaddle(level=self)
         self.ball_list.append(
-            assets.NormalBall(self.boundary, self.brick_list, level=self),
+            NormalBall(self.boundary, self.brick_list, level=self),
         )
 
         # Level attributes
@@ -622,17 +546,17 @@ class Level(arcade.View, ABC):
             f"_music.mp3",
             streaming=True,
         )
-        self.sound_player: Player | None = None
+        self.sound_player: pyglet.media.Player | None = None
 
         # Overwrite certain attributes if we are in a demo level
         if self.is_demo_level:
             self.display_info = DemoDisplayInfoBlock()
-            self.paddle = assets.DemoNormalPaddle(self)
+            self.paddle = DemoNormalPaddle(self)
             self.game_is_active = True
 
         # Level setup stuff
-        self.grid: list[list[type[assets.Brick] | None]] = []
-        self.icons: list[type[assets.Icon]] = []
+        self.grid: list[list[type[Brick] | None]] = []
+        self.icons: list[type[Icon]] = []
         self.populate_grid_and_icons()
         self.initialize_bricks_and_icons()
 
@@ -684,7 +608,7 @@ class Level(arcade.View, ABC):
 
                     self.brick_list.append(brick)
 
-        random_bricks: list[assets.Brick] = random.sample(
+        random_bricks: list[Brick] = random.sample(
             list(self.breakable_brick_list),
             k=len(self.icons),
         )
@@ -792,8 +716,8 @@ class Level(arcade.View, ABC):
         # This method of pausing is better than using arcade.pause or time.sleep because it
         # allows execution to continue, i.e drawing and updating
         elif self.lost_a_life and self.elapsed_time > PAUSE_TIME + TRANSITION_TIME:
-            self.paddle = assets.NormalPaddle(self)
-            ball = assets.NormalBall(self.boundary, self.brick_list, self)
+            self.paddle = NormalPaddle(self)
+            ball = NormalBall(self.boundary, self.brick_list, self)
             self.ball_list.append(ball)
 
             self.sound_player = self.background_music.play(volume=LOW_VOLUME)
@@ -929,7 +853,7 @@ class Level(arcade.View, ABC):
                 if self.paddle.is_magnetic:
                     self.paddle.release_magnetic_balls()
                 if self.paddle.is_shooter_active:
-                    self.bullet_list.append(assets.Bullet(self))
+                    self.bullet_list.append(Bullet(self))
                     self.shoot_sound.play(volume=NORMAL_VOLUME)
 
             # Escape
@@ -2213,7 +2137,7 @@ class FullscreenView(arcade.View):
         self.boundary = FullscreenBoundary()
         self.ball_list = arcade.SpriteList()
         self.brick_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
-        self.sound_player: Player | None = None
+        self.sound_player: pyglet.media.Player | None = None
 
         # Override in sub-classes
         self.background_music: arcade.Sound | None = None
@@ -2222,7 +2146,7 @@ class FullscreenView(arcade.View):
         """Add balls at random points, ensuring they are not place on top of a brick or another ball."""
         for i in range(RANDOM_BALLS):
             placed_successfully = False
-            ball = assets.NormalBall(self.boundary, self.brick_list)
+            ball = NormalBall(self.boundary, self.brick_list)
 
             # Randomize ball velocity directions
             ball.velocity_angle = random.randrange(45, 60)
@@ -2289,7 +2213,7 @@ class GameIntroView(FullscreenView):
 
         self.first_time_showing = True
         self.brick_list.append(
-            assets.ParanoidIntroBrick(
+            ParanoidIntroBrick(
                 center_x=SCREEN_WIDTH / 2,
                 center_y=SCREEN_HEIGHT / 2,
             ),
@@ -2338,7 +2262,7 @@ class MainMenuView(FullscreenView):
         self.elapsed_time = 0
         self.options = ["New Game", "How To Play", "High Scores", "Quit"]
         self.brick_list.append(
-            assets.MenuBrick(center_x=SCREEN_WIDTH / 2, center_y=SCREEN_HEIGHT / 2),
+            MenuBrick(center_x=SCREEN_WIDTH / 2, center_y=SCREEN_HEIGHT / 2),
         )
         self.add_random_balls()
         self.background_music = arcade.Sound(
@@ -2432,12 +2356,12 @@ class HighScoreView(FullscreenView):
         spacing = 60  # pixels
 
         # Create and position leader board brick
-        self.leader_board_brick = assets.LeaderBoardBrick(center_x=SCREEN_WIDTH / 2)
+        self.leader_board_brick = LeaderBoardBrick(center_x=SCREEN_WIDTH / 2)
         self.leader_board_brick.top = self.boundary.inner_top - spacing
         self.brick_list.append(self.leader_board_brick)
 
         # Create and position high scores brick
-        self.high_scores_brick = assets.HighScoresBrick(center_x=SCREEN_WIDTH / 2)
+        self.high_scores_brick = HighScoresBrick(center_x=SCREEN_WIDTH / 2)
         self.high_scores_brick.top = (
             self.boundary.inner_top - self.leader_board_brick.height - spacing * 2
         )
@@ -2532,12 +2456,12 @@ class NameEntryView(arcade.View):
         super().__init__()
         self.window = window
 
-        self.ui_manager = UIManager()
+        self.ui_manager = arcade.gui.UIManager()
         self.ui_manager.enable()
 
         width = 450
         height = 50
-        self.name_entry_box = UIInputText(
+        self.name_entry_box = arcade.gui.UIInputText(
             (SCREEN_WIDTH / 2) - (width / 2),
             (SCREEN_HEIGHT / 2 - (height / 2)),
             width=width,
@@ -2664,7 +2588,7 @@ class HowToPlayView(arcade.View):
             f"{AUDIO_BASE_PATH}/background_music/how_to_play_music.mp3",
             streaming=True,
         )
-        self.sound_player: Player | None = None
+        self.sound_player: pyglet.media.Player | None = None
 
         self.center_x = SCREEN_WIDTH / 2
         self.line_width = 40  # Pixels from one line to another

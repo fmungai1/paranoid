@@ -4,7 +4,7 @@
 
 import arcade
 
-import paranoid.levels as levels
+from paranoid.levels import GameIntroView
 
 
 class ParanoidGame(arcade.Window):
@@ -20,7 +20,7 @@ class ParanoidGame(arcade.Window):
         self.level_number = 0
         self.display_score = 0
 
-        self.show_view(levels.GameIntroView(self))
+        self.show_view(GameIntroView(self))
         self.set_mouse_visible(False)
 
     def reset_game(self):

@@ -17,7 +17,6 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     cast,
@@ -25,30 +24,24 @@ from typing import (
 
 import arcade
 
+from paranoid.constants import (
+    AUDIO_BASE_PATH,
+    BALL_MAX_SPEED,
+    BALL_MIN_SPEED,
+    BULLET_SPEED,
+    DEBUGGING,
+    ICON_SPEED,
+    IMAGES_BASE_PATH,
+    NORMAL_VOLUME,
+    PADDLE_SPEED,
+)
+
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
     from paranoid.levels import (
         Boundary,
         Level,
     )
-
-# Debugging mode - prevents the ball from falling if True
-DEBUGGING = False
-
-# Speed constants
-BALL_MIN_SPEED = 550
-BALL_MAX_SPEED = BALL_MIN_SPEED + 300
-PADDLE_SPEED = 500
-ICON_SPEED = 100
-BULLET_SPEED = 300
-
-# Volumes
-NORMAL_VOLUME = 0.3
-
-# Assets
-ASSETS_BASE_PATH = Path(__file__).parent.parent.parent / "assets"
-IMAGES_BASE_PATH = ASSETS_BASE_PATH / "images"
-AUDIO_BASE_PATH = ASSETS_BASE_PATH / "audio"
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
