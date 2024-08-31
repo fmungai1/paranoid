@@ -103,11 +103,16 @@ class Ball(arcade.Sprite, ABC):
     def set_velocity(self):
         """Calculate the velocity of the ball from `ball_speed` and `velocity_angle`."""
         # Ensure the ball speed is within the limits
+        # Fix black conflict with ruff (retain ruff formatting)
+        # fmt: off
         self.ball_speed = (
             BALL_MAX_SPEED
             if self.ball_speed > BALL_MAX_SPEED
-            else BALL_MIN_SPEED if self.ball_speed < BALL_MIN_SPEED else self.ball_speed
+            else BALL_MIN_SPEED
+            if self.ball_speed < BALL_MIN_SPEED
+            else self.ball_speed
         )
+        # fmt: on
 
         self.change_x = self.ball_speed * math.cos(math.radians(self.velocity_angle))
         self.change_y = self.ball_speed * math.sin(math.radians(self.velocity_angle))
