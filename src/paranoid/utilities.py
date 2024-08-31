@@ -15,10 +15,10 @@ from paranoid.constants import (
 
 
 def load_fonts():
-    """Load fonts from the font directory in they are not installed in the system."""
+    """Load fonts from the font directory in case they are not installed in the system."""
     pyglet.font.add_directory(FONTS_BASE_PATH)
-    if pyglet.font.have_font(BGOTHL) and pyglet.font.have_font(BGOTHM):
-        print("Yes! We have these fonts")
+    if not (pyglet.font.have_font(BGOTHL) and pyglet.font.have_font(BGOTHM)):
+        print("WARNING! Fonts not found!")
 
 
 def create_high_scores():
