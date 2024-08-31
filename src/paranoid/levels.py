@@ -23,7 +23,6 @@ from paranoid.assets import (
     AdvanceLevelIcon,
     AquaBrick,
     AquaLineBrick,
-    Ball,
     BBBBrick,
     BlueBrick,
     BlueLineBrick,
@@ -57,7 +56,6 @@ from paranoid.assets import (
     MultiColouredBrick2,
     MultiColouredBrick3,
     MultiColouredBrick4,
-    NormalBall,
     NormalPaddle,
     NormalWallBrick,
     ParanoidIntroBrick,
@@ -78,6 +76,10 @@ from paranoid.assets import (
     SplitBallIcon,
     UKFlagBrick,
     UnbreakableBrick,
+)
+from paranoid.balls import (
+    Ball,
+    NormalBall,
 )
 from paranoid.constants import (
     AUDIO_BASE_PATH,
