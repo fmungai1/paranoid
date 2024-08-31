@@ -415,11 +415,12 @@ class MainMenuView(FullscreenView):
 
         # If we have paused for enough time, display a random demo level
         if self.elapsed_time > DEMO_LEVEL_TIME / 2:
-            level_number = random.randrange(
-                1,
-                31,
-            )  # Include level 30 TODO: Generalize this (not 30, 31, etc)
-            level = eval(f"Level{level_number}(self.window, is_demo_level=True)")
+            # Include level 30
+            # TODO: Generalize this (not 30, 31, etc)
+            level_number = random.randrange(1, 31)
+            level = eval(
+                f"paranoid.levels.Level{level_number}(self.window, is_demo_level=True)",
+            )
             self.window.show_view(level)
             WHOOSH_SOUND.play(volume=NORMAL_VOLUME)
 
