@@ -4,20 +4,16 @@
 # e.g "ParanoidGame" in Level __init__ method
 from __future__ import annotations
 
-import os
 import random
 import time
 from abc import (
     ABC,
     abstractmethod,
 )
-from collections import namedtuple
 from typing import TYPE_CHECKING
 
 import arcade
 import arcade.gui
-import pyglet
-import pyglet.media
 
 from paranoid.balls import (
     Ball,
@@ -68,7 +64,6 @@ from paranoid.bricks import (
 from paranoid.constants import (
     AUDIO_BASE_PATH,
     BGOTHL,
-    BGOTHM,
     BONUS_COLLECTED,
     BONUS_NOT_COLLECTED,
     BOUNDARY_THICKNESS,
@@ -83,7 +78,6 @@ from paranoid.constants import (
     DISPLAY_BLOCK_TEXT_KEY,
     ENTER_NAME_HEADING,
     ENTER_SOUND,
-    FONTS_BASE_PATH,
     GRAVITY,
     HIGH_SCORES_FILE,
     HIGH_SCORES_HEADING,
@@ -131,52 +125,13 @@ from paranoid.paddles import (
     DemoNormalPaddle,
     NormalPaddle,
 )
+from paranoid.utilities import get_high_scores
 
 # Prevents circular import error by setting this variable False at runtime
 if TYPE_CHECKING:
+    import pyglet.media
+
     from paranoid.main import ParanoidGame
-
-
-pyglet.font.add_directory(FONTS_BASE_PATH)
-if pyglet.font.have_font(BGOTHL) and pyglet.font.have_font(BGOTHM):
-    print("Yes! We have these fonts")
-
-
-def create_high_scores():
-    """Generate the default high-scores file."""
-    with open(HIGH_SCORES_FILE, "w") as high_scores_file:
-        high_scores_file.write("name,level,score,datetime\n")
-        for i in range(10, 0, -1):
-            if i % 2 == 0:  # even
-                high_scores_file.write(f"Freddy,{int(i/2)},{i*5000},{time.asctime()}\n")
-            else:
-                high_scores_file.write(
-                    f"BBB,{int((i+1)/2)},{i*5000},{time.asctime()}\n",
-                )
-
-
-def get_high_scores():
-    """
-    Get the 10 best scores from the high-scores file.
-
-    :return: a list of namedtuples which represent each entry
-    """
-    Entry = namedtuple("Entry", "name level score")
-    high_scores_list: list[Entry] = []
-
-    # If HIGH_SCORES_FILE does not exist, create it TODO: Use sqlite db instead of flat file
-    if not os.path.isfile(HIGH_SCORES_FILE):
-        create_high_scores()
-
-    with open(HIGH_SCORES_FILE) as high_scores_file:
-        next(high_scores_file)  # Skip the heading
-        for line in high_scores_file:
-            # Ignore datetime column - only used to see how often game is played
-            row = line.split(",")
-            name, level, score = row[0], row[1], int(row[2])  # Save score as int
-            high_scores_list.append(Entry(name, level, score))
-
-    return sorted(high_scores_list, key=lambda entry: entry.score, reverse=True)[:10]
 
 
 HIGH_SCORES = get_high_scores()

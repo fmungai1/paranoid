@@ -5,6 +5,7 @@
 import arcade
 
 from paranoid.levels import GameIntroView
+from paranoid.utilities import load_fonts
 
 
 class ParanoidGame(arcade.Window):
@@ -38,4 +39,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_fonts()
     main()
