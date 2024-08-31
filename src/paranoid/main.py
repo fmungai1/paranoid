@@ -4,8 +4,8 @@
 
 import arcade
 
-from paranoid.levels import GameIntroView
 from paranoid.utilities import load_fonts
+from paranoid.views import GameIntroView
 
 
 class ParanoidGame(arcade.Window):
