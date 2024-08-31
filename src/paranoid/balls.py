@@ -21,11 +21,7 @@ from typing import (
 
 import arcade
 
-# Prevents circular import error by setting this variable False at runtime
-if TYPE_CHECKING:
-    from paranoid.levels import Boundary, Level
-
-from paranoid.assets import Brick
+from paranoid.bricks import Brick
 from paranoid.constants import (
     BALL_MAX_SPEED,
     BALL_MIN_SPEED,
@@ -33,6 +29,13 @@ from paranoid.constants import (
     IMAGES_BASE_PATH,
     NORMAL_VOLUME,
 )
+
+# Prevents circular import error by setting this variable False at runtime
+if TYPE_CHECKING:
+    from paranoid.levels import (
+        Boundary,
+        Level,
+    )
 
 
 class Ball(arcade.Sprite, ABC):
