@@ -1,10 +1,19 @@
-[tool.poetry]
+[project]
 name = "paranoid"
-version = "1.1.0"
+dynamic = ["version"]
 description = "Remake of the classic Paranoid game"
-authors = ["Fredrick Mungai <https://github.com/fmungai1>"]
+authors = [{name = "Fredrick Mungai", email = "fmungai1@paranoid.bbb"}]
 readme = "README.md"
+license = { text = "GPL-3.0-only" }
+requires-python = "^3.10"
+dependencies = [
+    "arcade",
+]
+
+[tool.poetry]
+version = "1.1.0"
 packages = [{include = "paranoid", from = "src"}]
+requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -21,8 +30,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 target-version = "py310"
 line-length = 88
-
-[tool.ruff.lint]
 unfixable = [
     "ERA",  # do not autoremove commmented out code
 ]
@@ -35,12 +42,12 @@ extend-select = [
     "PGH",  # pygrep
     "RUF",  # ruff checks
     "SIM",  # flake8-simplify
-    "TCH",  # flake8-type-checking
+    "TC",   # flake8-type-checking
     "TID",  # flake8-tidy-imports
     "UP",   # pyupgrade
 ]
 
-[tool.ruff.lint.flake8-tidy-imports]
+[tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
 
 [tool.black]

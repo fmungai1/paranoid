@@ -70,8 +70,8 @@ repos:
         additional_dependencies: ["tomli"]
 
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.8.0
+    rev: 2.0.1
     hooks:
       - id: poetry-check
+        args: [--lock, --strict]
       - id: poetry-lock
-        args: [--check, --no-update]
